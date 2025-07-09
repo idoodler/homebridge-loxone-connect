@@ -1,4 +1,5 @@
 const IrrigationItem = function(widget,platform,homebridge) {
+    Characteristic = homebridge.hap.Characteristic;
 
     this.platform = platform;
     this.widget = widget;
@@ -16,15 +17,15 @@ IrrigationItem.prototype.callBack = function(currentZone) {
     this.currentState = currentZone !== -1;
 
     this.otherService.getCharacteristic(Characteristic.Active)
-        .updateValue(this.currentState);
+        .updateValue(this.currentState ? Characteristic.Active.ACTIVE : Characteristic.Active.INACTIVE);
     this.otherService.getCharacteristic(Characteristic.InUse)
-        .updateValue(this.currentState);
+        .updateValue(this.currentState ? Characteristic.InUse.IN_USE : Characteristic.InUse.NOT_IN_USE);
 };
 
 IrrigationItem.prototype.getOtherServices = function() {
     const otherService = new this.homebridge.hap.Service.Valve();
 
-    otherService.getCharacteristic(Characteristic.ValveType).updateValue(this.currentState);
+    otherService.getCharacteristic(Characteristic.ValveType).updateValue(Characteristic.ValveType.IRRIGATION);
 
     otherService.getCharacteristic(Characteristic.Active)
     .on('set', this.setItemState.bind(this))
